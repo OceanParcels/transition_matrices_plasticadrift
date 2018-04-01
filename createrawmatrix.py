@@ -20,14 +20,9 @@ class structtype():
 
 def timeToMonths(timeList) :
   months = []
-  #check = 0
   for x in timeList:
     time = datetime.datetime.fromordinal(int(x)-366).strftime('%Y-%m-%d %H:%M:%S')
-    #check += 1
     months.append(int(time[5:7]))
-    #if check > 9000 :
-      #print(months[-4:-1])
-    #  check = 0
   return(np.array(months))
 
 #form M: Lons/lats consists of lists for target areas. The last list in M.lons, M.lats is the full global scale, 
@@ -43,27 +38,20 @@ for x in np.arange(M.nd):
     M.lons.insert(0,[])
     M.lats.insert(0,[])
 
+#define areas for matrix. Make sure the global area is the last entry.
 M.xStarts = np.array([-180]) #,-180])
 M.xEnds   = np.array([180]) #, 180])
 
 M.yStarts = np.array([-90]) #,-90])
 M.yEnds   = np.array([90]) #, 90])
 
-#global area
-M.lons[-1] = np.linspace(M.xStarts[-1], M.xEnds[-1],  ((M.xEnds[-1] - M.xStarts[-1])/ M.dd[-1] + 1), dtype='i4')
-M.lats[-1] = np.linspace(M.yStarts[-1], M.yEnds[-1],  ((M.yEnds[-1] - M.yStarts[-1])/ M.dd[-1] + 1), dtype='i4')
-
-#target area(s):
-#M.lons[0] = np.linspace(M.xStarts[0], M.xEnds[0],  ((M.xEnds[0] - M.xStarts[0])/ M.dd[0] + 1))
-#M.lats[0] = np.linspace(M.yStarts[0], M.yEnds[0],  ((M.yEnds[0] - M.yStarts[0])/ M.dd[0] + 1))
-
-#M.lons[1] = np.linspace(M.xStarts[1], M.xEnds[1],  ((M.xEnds[1] - M.xStarts[1])/ M.dd[1] + 1))
-#M.lats[1] = np.linspace(M.yStarts[1], M.yEnds[1],  ((M.yEnds[1] - M.yStarts[1])/ M.dd[1] + 1))
-
+for i in np.arange(M.lons.size) :
+  M.lons[i] = np.linspace(M.xStarts[i], M.xEnds[i],  ((M.xEnds[i] - M.xStarts[i])/ M.dd[i] + 1), dtype='i4')
+  M.lats[i] = np.linspace(M.yStarts[i], M.yEnds[i],  ((M.yEnds[i] - M.yStarts[i])/ M.dd[i] + 1), dtype='i4')
 
 # nx, ny number of elements in lons, lats per region. nc is the number of total grid cells used in later construction of raw matrix.
 # Loop for all target areas
-M.nc = np.zeros(np.shape(M.dd))
+M.nc = np.empty(np.shape(M.dd))
 M.nx, M.ny, M.nc = [[] for x in M.dd],[[] for x in M.dd],[[] for x in M.dd]
 
 for d in range(M.nd):
@@ -71,9 +59,9 @@ for d in range(M.nd):
     M.ny[d] = np.size(M.lats[d])
     M.nc[d] = int(M.nx[d] * M.ny[d] + np.sum(M.nc[0:d]))
 M.tau=60 #days. This is the timestep used for integration.
-M.nt = int(360/M.tau) #total amount of timesteps
+M.nt = int(365/M.tau) #total amount of timesteps
 
-M.dir = 'fwd'
+M.dir = 'fwd' #for dispersion forward in time, other option is 'bwd' for backward dispersion
 types= ['buoy','ofes'] #['test']
 
 # import all trajectory files corresponding to type, hence * in path.
