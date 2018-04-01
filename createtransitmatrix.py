@@ -14,7 +14,7 @@ import warnings
 with warnings.catch_warnings():
   warnings.filterwarnings("ignore",category=FutureWarning) 
   import h5py
-import createrawmatrix as raw
+import createrawmatrix
 
 class structtype():
     pass
@@ -24,13 +24,13 @@ folder = 'rawMatrices'
 
 Mbuoy = structtype()
 Mmodel = structtype()
-M = raw.M     #import initial values (such as M.nt, M.nc) from createrawmatrix.py
+M = createrawmatrix.M     #import initial values (such as M.nt, M.nc) from createrawmatrix.py
 
 #target area(s):
 lon = M.lons[-1]
 lat = M.lats[-1]
 
-M.buoyenhancefactor = 10
+M.buoyenhancefactor = 10 #factor used for weighing observational data (buoy) with model data (OFES), e.g. buoyenhancefactor = 10 weighs observational data to model data 10:1.
 
 Mbuoy.P = [[] for x in range(M.nt)]
 for x in range(M.nt):
@@ -47,7 +47,6 @@ for i in range(numberOFES) :
         b = sparse.load_npz(os.path.join(folder, 'ofestransitmatrix_'+M.dir+'_raw_'+str(i)+'_monthindex'+str(x)+'.npz'))
         Mmodel.P[x] = Mmodel.P[x] + b
 
-M.buoyenhancefactor = 10
 #weigh buoy observational data with OFES model data
 for m in range(M.nt):
     if np.isfinite(M.buoyenhancefactor) and M.buoyenhancefactor > 0:
@@ -97,9 +96,9 @@ for b in unique:
 
 indicrop = [[] for _ in np.arange(M.nt) ]
 for m in np.arange(M.nt):
-    indicrop[m] = indi[m][0:tel[m]]
+    indicrop[m] = indi[m][0:tel[m]] #crop indi[m] to remove all unused elements at the end, so only relevent values are added to the sparse matrix.
     M.P[m]=  M.P[m] + sparse.coo_matrix((np.ones(indicrop[m].size),(indicrop[m],indicrop[m])),shape=(M.nc[-1],M.nc[-1]))
-    M.P[m].tocoo()
+    M.P[m].tocoo() #conversion from csr_matrix to coo_matrix to allow for indexing
 
 #fix points where you can get in but not get out
 for m in range(M.nt):
