@@ -39,11 +39,11 @@ for x in np.arange(M.nd):
     M.lats.insert(0,[])
 
 #define areas for matrix. Make sure the global area is the last entry.
-M.xStarts = np.array([-180]) #,-180])
-M.xEnds   = np.array([180]) #, 180])
+M.xStarts = np.array([-180])
+M.xEnds   = np.array([180])
 
-M.yStarts = np.array([-90]) #,-90])
-M.yEnds   = np.array([90]) #, 90])
+M.yStarts = np.array([-90]) 
+M.yEnds   = np.array([90]) 
 
 for i in np.arange(M.lons.size) :
   M.lons[i] = np.linspace(M.xStarts[i], M.xEnds[i],  ((M.xEnds[i] - M.xStarts[i])/ M.dd[i] + 1), dtype='i4')
