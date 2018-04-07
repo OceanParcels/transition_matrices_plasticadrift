@@ -35,17 +35,16 @@ M.buoyenhancefactor = 10 #factor used for weighing observational data (buoy) wit
 Mbuoy.P = [[] for x in range(M.nt)]
 for x in range(M.nt):
     Mbuoy.P[x] = sparse.load_npz(os.path.join(folder, 'buoytransitmatrix_'+M.dir+'_raw_0_monthindex'+str(x)+'.npz'))
- 
-numberOFES = 19
 
 Mmodel.P  = [sparse.coo_matrix((M.nc[-1],M.nc[-1])) for x in range(M.nt)]
 M.P  = [sparse.coo_matrix((M.nc[-1],M.nc[-1])) for x in range(M.nt)]
 M.nCross  = [sparse.coo_matrix((M.nc[-1],M.nc[-1])) for x in range(M.nt)]
 
-for i in range(numberOFES) :
-    for x in range(M.nt):
-        b = sparse.load_npz(os.path.join(folder, 'ofestransitmatrix_'+M.dir+'_raw_'+str(i)+'_monthindex'+str(x)+'.npz'))
-        Mmodel.P[x] = Mmodel.P[x] + b
+OFESfiles = glob(folder + "/ofestransitmatrix_" + M.dir + "_raw_*.npz") #creates a list with all paths to OFES files
+for item in OFESfiles:
+    x = int(item[-5]) #this is the month/timestep index in every filename
+    b = sparse.load_npz(item)
+    Mmodel.P[x] = Mmodel.P[x] + b
 
 #weigh buoy observational data with OFES model data
 for m in range(M.nt):
