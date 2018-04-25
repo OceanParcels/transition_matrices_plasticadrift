@@ -45,7 +45,7 @@ M.xEnds   = np.array([180])
 M.yStarts = np.array([-90]) 
 M.yEnds   = np.array([90]) 
 
-for i in np.arange(M.lons.size) :
+for i in np.arange(len(M.lons)) :
   M.lons[i] = np.linspace(M.xStarts[i], M.xEnds[i],  ((M.xEnds[i] - M.xStarts[i])/ M.dd[i] + 1), dtype='i4')
   M.lats[i] = np.linspace(M.yStarts[i], M.yEnds[i],  ((M.yEnds[i] - M.yStarts[i])/ M.dd[i] + 1), dtype='i4')
 
