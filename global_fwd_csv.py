@@ -5,7 +5,6 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"]="3"
 import csv
 import numpy as np
 from scipy import sparse
-from numpy import genfromtxt
 import calendar
 
 import createrawmatrix
@@ -23,13 +22,13 @@ outputFolder = 'CSV_files'
 
 beaching = True #whether to include beaching into results or not
 beachingmodel = 'frac' #other option: 'adj'. Set beaching model to either the Fractional Coast Model or Adjacent Coast Model, see paper.
-beachingpercentage = 30 #scaling factor for beaching model, in procent
+scaling = 30 #scaling factor for beaching model, in procent
 
 M = createrawmatrix.M #import createrawmatrix for parameters of model (such as range longitudes, latitudes, dx, dt)
-landpoints = genfromtxt('Landpoints/landpoints.csv', delimiter=',') #array of 1's for land and 0's for sea for every grid cell in model
+landpoints = np.genfromtxt('Landpoints/landpoints.csv', delimiter=',') #array of 1's for land and 0's for sea for every grid cell in model
 
 maxyears = 10 #duration of simulation
-minplotval = 0.000000000001 #minimal value included in results. If some location has less tracer in it than this amount, the tracer is removed from the ocean.
+minplotval = 1e-12 #minimal value included in results. If some location has less tracer in it than this amount, the tracer is removed from the ocean.
 offset = np.arange(M.nt) #array of all starting timesteps that are evaluated
 numints = maxyears*M.nt + 1 #number of computational iterations
 
@@ -47,7 +46,7 @@ for x in range(M.nt):
 if beaching: #load beaching data corresponding to set model and determine the chance of particle tracer ending on shore
     beachdata = np.genfromtxt(os.path.join('beachingCoastlines', beachingmodel + '_coast_dx_' + str((M.dd[-1] * 100).astype(int)) + '_region_'+region+'.csv'),delimiter=',',skip_header=1)
     beachdata = np.transpose(beachdata)
-    beach = 1 - beachdata[3] * beachingpercentage / 100 #chance of tracer ending on shore
+    beach = 1 - beachdata[3] * scaling #chance of tracer ending on shore
 
     if beach.size != M.nc[-1] :
         print("Resolution of beaching grid and transition matrix don't match")
@@ -59,10 +58,10 @@ for i in indices:
     
         if beaching: #create subfolder within index folder to differentiate beaching scaling sizes 
             try :
-                os.mkdir(os.path.join(folder, "beach_" + str(beachingpercentage) + "_perc"))
-                folder = folder + "//beach_" + str(beachingpercentage) + "_perc"
+                os.mkdir(os.path.join(folder, "beach_" + str(scaling * 100) + "_perc"))
+                folder = folder + "//beach_" + str(scaling * 100) + "_perc"
             except:
-                folder = folder + "//beach_" + str(beachingpercentage) + "_perc"
+                folder = folder + "//beach_" + str(scaling * 100) + "_perc"
         else:
             try : #create subfolder per index, unless it already exists
                 os.mkdir(os.path.join(folder, "no_beaching"))
@@ -74,8 +73,8 @@ for i in indices:
             m = int(np.floor(t * 12/M.nt)) #calendar month on which the iteration starts (first day of month m)
 
             if beaching : #save tracer per location per timestep in "savefile" and save the amount of tracer ending on shore per location per timestep in "totalbeachedfile"
-                savefile = os.path.join(folder, str(i) + "_startsin" + calendar.month_name[m+1] + "_beaching_" + str(beachingpercentage) + ".csv") #m+1 because month_index 0 is month 1 (January)
-                totalbeachedfile = os.path.join(folder, str(i) + "_startsin" + calendar.month_name[m+1] + "_beaching_" + str(beachingpercentage) + "totalbeached.csv")
+                savefile = os.path.join(folder, str(i) + "_startsin" + calendar.month_name[m+1] + "_beaching_" + str(scaling * 100) + ".csv") #m+1 because month_index 0 is month 1 (January)
+                totalbeachedfile = os.path.join(folder, str(i) + "_startsin" + calendar.month_name[m+1] + "_beaching_" + str(scaling * 100) + "totalbeached.csv")
             else: #save tracer per location per timestep in "savefile"
                 savefile = os.path.join(folder, str(i) + "_startsin" + calendar.month_name[m+1] + ".csv") #m+1 because month_index 0 is month 1 (January)
             f1 = open(savefile,'w')
