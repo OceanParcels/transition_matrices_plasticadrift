@@ -22,7 +22,7 @@ outputFolder = 'CSV_files'
 
 beaching = True #whether to include beaching into results or not
 beachingmodel = 'frac' #other option: 'adj'. Set beaching model to either the Fractional Coast Model or Adjacent Coast Model, see paper.
-scaling = 30 #scaling factor for beaching model, in procent
+scaling = 0.3 #scaling factor for beaching model, in procent
 
 M = createrawmatrix.M #import createrawmatrix for parameters of model (such as range longitudes, latitudes, dx, dt)
 landpoints = np.genfromtxt('Landpoints/landpoints.csv', delimiter=',') #array of 1's for land and 0's for sea for every grid cell in model
