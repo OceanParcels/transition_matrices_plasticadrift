@@ -13,7 +13,9 @@ class structtype():
     pass
 
 def ravel(lat, lon) : #function for conversion between latitudes and longitudes (user friendly) to index of model
-    ind = np.ravel_multi_index((lon-M.lons[-1][0],lat-M.lats[-1][0]),(M.nx[-1],M.ny[-1]),order='F')
+    xi = np.round((lon-M.lons[-1][0])/M.dd[-1]).astype(int)
+    yi = np.round((lat-M.lats[-1][0])/M.dd[-1]).astype(int)
+    ind = np.ravel_multi_index((xi,yi),(M.nx[-1],M.ny[-1]),order='F')
     return ind
 
 region = 'global'
@@ -101,8 +103,9 @@ for i in indices:
                     val = vals[j]
                     f1.write(str(year) + ',' + str(mon) + ',' + str(lat[pY[j]]) + ',' + str(lon[pX[j]]) + ',' + str(val) + '\n')
                 count += 1
+                vsum_pre = v.sum()
                 v = v * transitMatrix[bm] #multiply v with transit matrix for next iteration
-
+                v = v * vsum_pre/v.sum() #renormalize to account for floating point errors
 
                 if beaching:
                     initialv = v
