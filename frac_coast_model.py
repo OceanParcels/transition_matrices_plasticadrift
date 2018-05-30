@@ -3,7 +3,6 @@ import sys
 import os
 import csv
 import numpy as np
-from numpy import genfromtxt
 
 import createrawmatrix
 
@@ -14,7 +13,7 @@ M = createrawmatrix.M
 
 region = 'global'
 
-earthGrid = genfromtxt(os.path.join(os.getcwd(),'elevationdata.csv'), delimiter=',',dtype=float)
+earthGrid = np.genfromtxt(os.path.join(os.getcwd(),'elevationdata.csv'), delimiter=',',dtype=float)
 earthGrid = np.array(earthGrid)
 #earthGrid is a 3601x1801 matrix, where the first column is latitude (89.95 up until -89.95, from North to South with increasing index)
 #and the first row being latitude from -179.95 up to 179.95
